@@ -1,18 +1,17 @@
 const CryptoJS = require('crypto-js');
+const config = require('../config');
 
 const encryptMobile = (mobileNumber) => {
   return CryptoJS.AES.encrypt(
     mobileNumber,
-    // @ts-ignore
-    process.env.ENCRYPTION_KEY
+    config.encryptionKey
   ).toString();
 };
 
 const decryptMobile = (encryptedMobile) => {
   const bytes = CryptoJS.AES.decrypt(
     encryptedMobile,
-    // @ts-ignore
-    process.env.ENCRYPTION_KEY
+    config.encryptionKey
   );
   return bytes.toString(CryptoJS.enc.Utf8);
 };

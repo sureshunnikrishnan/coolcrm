@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { validateCustomer } = require('../middleware/validateRequest');
+const { validateCustomer } = require('../../middleware/validateRequest');
 const {
   createCustomer,
   getCustomers,
   getCustomerById,
-} = require('../controllers/customerController');
+} = require('./customerController');
 
 router.post('/', validateCustomer, createCustomer);
 router.get('/', getCustomers);

@@ -1,7 +1,7 @@
 const express = require('express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const customerRoutes = require('./routes/customerRoutes');
+const customerRoutes = require('./features/customer/customerRoutes');
 
 const app = express();
 
@@ -23,7 +23,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ['./src/controllers/*.js'],
+  apis: ['./src/features/customer/*.js', './src/features/customer/customerController.js'], // Adjusted for new structure
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
@@ -31,5 +31,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use('/api/customers', customerRoutes);
+
+// Centralized Error Handler
+const errorHandler = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 module.exports = app;

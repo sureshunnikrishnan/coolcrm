@@ -1,5 +1,4 @@
-const prisma = require('../config/database');
-const { encryptMobile, decryptMobile } = require('../utils/encryption');
+const customerService = require('./customerService');
 
 /**
  * @swagger
@@ -28,23 +27,13 @@ const { encryptMobile, decryptMobile } = require('../utils/encryption');
  *       201:
  *         description: Customer created successfully
  */
-const createCustomer = async (req, res) => {
+const createCustomer = async (req, res, next) => {
   try {
-    const { name, mobileNumber, email } = req.body;
-    const encryptedMobile = encryptMobile(mobileNumber);
-
-    const customer = await prisma.customer.create({
-      data: {
-        name,
-        mobileNumber,
-        encryptedMobile,
-        email,
-      },
-    });
-
+    const customer = await customerService.createCustomer(req.body);
     res.status(201).json(customer);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    // Pass error to the next middleware (error handler)
+    next(error);
   }
 };
 
@@ -58,12 +47,12 @@ const createCustomer = async (req, res) => {
  *       200:
  *         description: List of customers
  */
-const getCustomers = async (req, res) => {
+const getCustomers = async (req, res, next) => {
   try {
-    const customers = await prisma.customer.findMany();
+    const customers = await customerService.getAllCustomers();
     res.json(customers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
@@ -83,11 +72,9 @@ const getCustomers = async (req, res) => {
  *       200:
  *         description: Customer details
  */
-const getCustomerById = async (req, res) => {
+const getCustomerById = async (req, res, next) => {
   try {
-    const customer = await prisma.customer.findUnique({
-      where: { id: parseInt(req.params.id) },
-    });
+    const customer = await customerService.getCustomerById(req.params.id);
     
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
@@ -95,7 +82,7 @@ const getCustomerById = async (req, res) => {
     
     res.json(customer);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 

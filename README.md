@@ -11,7 +11,10 @@ The CoolCRM Backend Application is a **RESTful API built with Node.js, Express, 
 *   **API Documentation**: Swagger integration for interactive API documentation and exploration [3, 4].
 *   **Data Validation**: Implements input validation to ensure data integrity [6, 8].
 *   **Database ORM**: Uses Prisma for type-safe database access and migrations [2, 8].
-*   **Environment Configuration**: Utilizes `dotenv` for managing environment-specific configuration [3, 9].
+*   **Environment Configuration**: Utilizes `dotenv` and a centralized configuration module (`src/config`) for managing environment-specific settings.
+*   **Service Layer**: Business logic is separated from controllers into services (e.g., `src/features/customer/customerService.js`).
+*   **Modular Structure**: Code is organized by features (e.g., `src/features/customer`).
+*   **Centralized Error Handling**: Consistent error responses are managed by a dedicated middleware (`src/middleware/errorHandler.js`).
 
 ## Technologies Used
 
@@ -238,16 +241,38 @@ The CoolCRM Backend Application is a **RESTful API built with Node.js, Express, 
 
 ### Input Validation
 
-*   The application uses `express-validator` middleware to validate incoming data, preventing common security vulnerabilities such as injection attacks [6, 8].
+*   The application uses `express-validator` middleware (`src/middleware/validateRequest.js`) to validate incoming data, preventing common security vulnerabilities such as injection attacks [6, 8].
 
-## Maintainability and Scalability Improvements (Future Considerations)
+## Project Structure Overview
 
-*   **Service Layer**: Decouple database logic from controllers by introducing a service layer.
-*   **Centralized Configuration**: Use a dedicated configuration module for managing environment variables.
-*   **Consolidated Middleware**: Group all middleware functions into a single module.
-*   **Centralized Error Handling**: Implement error-handling middleware for consistent error responses.
-*   **Code Reusability**: Extract duplicated code blocks into reusable functions or modules.
-*   **Input Sanitization**: Add input sanitization to prevent injection attacks.
-*   **Rate Limiting**: Implement rate limiting middleware to prevent abuse of the API endpoints.
-*   **Modular Project Structure**: Group related files into feature-specific directories.
-*   **Logging**: Integrate a logging library for debugging, monitoring, and auditing.
+The project follows a feature-based structure to enhance modularity and scalability:
+
+*   `src/`: Main source code directory.
+    *   `app.js`: Express application setup, middleware registration, and route aggregation.
+    *   `server.js`: HTTP server initialization.
+    *   `config/`: Contains configuration files.
+        *   `index.js`: Centralized configuration module, loads environment variables.
+        *   `database.js`: Prisma client instance.
+    *   `features/`: Contains directories for different application features.
+        *   `customer/`: Example feature for customer management.
+            *   `customerController.js`: Handles request/response logic for customer routes.
+            *   `customerService.js`: Contains business logic for customer operations.
+            *   `customerRoutes.js`: Defines API routes for customers.
+    *   `middleware/`: Contains Express middleware.
+        *   `validateRequest.js`: Middleware for request validation (e.g., using `express-validator`).
+        *   `errorHandler.js`: Centralized error handling middleware.
+    *   `utils/`: Utility functions.
+        *   `encryption.js`: Encryption/decryption helper functions.
+*   `prisma/`: Prisma schema and migration files.
+    *   `schema.prisma`: Defines the database schema.
+*   `.env`: Environment variable definitions (not committed to version control).
+*   `package.json`: Project metadata and dependencies.
+*   `Dockerfile`, `docker-compose.yml`: Docker configuration.
+
+## Further Considerations (Potential Future Enhancements)
+
+*   **Code Reusability**: Continue to identify and extract duplicated code blocks into reusable functions or modules within `src/utils` or feature-specific utility files.
+*   **Input Sanitization**: While validation is in place, explicit input sanitization (e.g., using a library like `sanitize-html` for string inputs if they are ever rendered, or custom sanitizers for other types) can add an extra layer of defense against XSS and other injection attacks, depending on data usage.
+*   **Rate Limiting**: Implement rate limiting middleware (e.g., `express-rate-limit`) to protect API endpoints from abuse and ensure fair usage.
+*   **Comprehensive Logging**: Integrate a more robust logging library (e.g., Winston, Pino) for structured, leveled logging, which can be invaluable for debugging, monitoring, and auditing in production environments.
+*   **Testing**: Implement a comprehensive testing suite, including unit tests (e.g., with Jest or Mocha) for services and utilities, and integration tests for API endpoints (e.g., with Supertest).
